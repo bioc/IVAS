@@ -1,0 +1,20 @@
+#Import packages dependencies
+#import(foreach)
+#import(GenomicFeatures)
+importFrom(doParallel,registerDoParallel)
+importFrom(lme4,glmer)
+importFrom(foreach,foreach,"%dopar%")
+importFrom(AnnotationDbi,select)
+importFrom(GenomicFeatures,makeTranscriptDbFromGFF,exonsBy,intronsByTranscript,isActiveSeq,"isActiveSeq<-")
+importFrom(GenomicRanges,GRanges,elementMetadata)
+importFrom(IRanges,IRanges,findOverlaps)
+importFrom(BiocGenerics,strand)
+importFrom(GenomeInfoDb,seqinfo,seqlevels)
+importMethodsFrom(Matrix,as.matrix)
+importMethodsFrom(BiocGenerics,unlist)
+importMethodsFrom(S4Vectors,Rle)
+
+
+#Export all names
+export(calSignificant,chrseparate,findAlternative,findOversnp,MsqtlFinder,saveBplot,sqtlfinder)
+
