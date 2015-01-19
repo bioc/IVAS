@@ -1,5 +1,8 @@
 findOversnp <- function(altInvalue=NULL,snprange=NULL){
     Inrange <- altInvalue[["alterIntron"]]
+    if (length(Inrange) == 0){
+        return (NULL)
+        }
     Inoverapmatrix <- NULL
     Startoverapmatrix <- NULL
     Endoverapmatrix <- NULL
@@ -15,9 +18,9 @@ findOversnp <- function(altInvalue=NULL,snprange=NULL){
                 snplist[as.integer(i)]
                 })
             Inoverapmatrix <- cbind(over.range,over.snp)
+            colnames(Inoverapmatrix) <- c("range","snp")
+            rownames(Inoverapmatrix) <- c(1:nrow(Inoverapmatrix))
             }
         }
-    colnames(Inoverapmatrix) <- c("range","snp")
-    rownames(Inoverapmatrix) <- c(1:nrow(Inoverapmatrix))
     return (unique(Inoverapmatrix))
     }

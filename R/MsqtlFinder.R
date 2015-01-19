@@ -48,7 +48,8 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
             }
         if (length(pa.result)>0){
             predictSQTL <- unique(rbind(predictSQTL,pa.result))
-        }}
+            }
+        }
     lm.sig.sqtl <- NULL
     glm.sig.sqtl <- NULL
     if (met == "lm" | met == "both"){
@@ -75,6 +76,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         if (met == "glm" | met == "both"){saveBplot(glm.sig.sqtl,expdata,snpdata,snplocus,GTFdata,bplotout)}
         }
     total.sqtl <- rbind(lm.sig.sqtl,glm.sig.sqtl)
+    rownames(predictSQTL) <- c(1:nrow(predictSQTL))
     colnames(total.sqtl) <- colnames(predictSQTL)
     return (total.sqtl)
     }

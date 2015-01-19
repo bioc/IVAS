@@ -56,6 +56,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             if (z < Nmax){
                 tx.gene.start <- tx.gene.start[(cal.end >= tx.gene.start[,"TXSTART"] & cal.end <= tx.gene.start[,"TXEND"]),]
                 grep.intron <- grep(cal.end,intron.locus)
+                grep.intron <- grep.intron[which(grep.intron!=length(intron.locus))]
                 if (length(grep.intron) != 0){
                     nextstart <- grep.intron[names(intron.locus[grep.intron]) == names(intron.locus[grep.intron+1])]
                     if (length(nextstart) != 0){
@@ -74,6 +75,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             else if (z >= Nmax){
                 tx.gene.start <- tx.gene.start[(cal.start >= tx.gene.start[,"TXSTART"] & cal.start <= tx.gene.start[,"TXEND"]),]
                 grep.intron <- grep(cal.start,intron.locus)
+                grep.intron <- grep.intron[which(grep.intron!=1)]
                 if (length(grep.intron) != 0){
                     nextstart <- grep.intron[names(intron.locus[grep.intron]) == names(intron.locus[grep.intron-1])]
                     if (length(nextstart) != 0){
@@ -162,6 +164,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             ratio <- ratio[realNA]
             notratio <- notratio[realNA]
             haveratio <- haveratio[realNA]
+            realNA <- realNA[is.element(realNA,colnames(samp.snp))]
             resnp <- samp.snp[,realNA]
             ratio <- ratio[colnames(resnp)]
             notratio <- notratio[colnames(resnp)]
@@ -170,9 +173,6 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                 samp.form <- as.character(as.matrix(samp.snp[x,realNA]))
                 if (length(unique(samp.form))>1 & nrow(have.exp) >0 & nrow(not.exp)>0){
                     genoform <- as.matrix(resnp[x,])
-                    if (method == "boxplot"){
-                        return (t(rbind(ratio,genoform)))
-                        }
                     lm.geno <- unique(unlist(strsplit(rownames(table(genoform)),"")))
                     if(length(lm.geno)==2){
                         pregeno <- gsub(lm.geno[1],0,genoform)
@@ -189,28 +189,30 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                     if(length(table(matrix.geno))<2){next}
                     colnames(matrix.geno) <- colnames(pregeno)
                     rownames(matrix.geno) <- rownames(pregeno)
-                    lm.genoform <- matrix.geno
+                    lm.genoform <- as.integer(matrix.geno)
                     auo.matrix <- data.frame(ratio=ratio,group=factor(lm.genoform))
                     split.g <- split(auo.matrix$ratio,auo.matrix$group)
                     mamean <- sapply(split.g,median)
                     lm.auo.pvalue <- "NaN"
                     glm.auo.pvalue <- "NaN"
                     if (method == "lm" | method == "both"){
-                        auo <- summary(lm(formula = ratio ~ as.integer(group), data = auo.matrix))
-                        if (length(auo$fstatistic[1])>0 &length(auo$fstatistic[2])>0 & length(auo$fstatistic[3])>0){
-                            lm.auo.pvalue <- pf(auo$fstatistic[1],auo$fstatistic[2],auo$fstatistic[3],lower.tail=FALSE)
+                        auo <- try(suppressWarnings(summary(lm(ratio ~ lm.genoform))),silent=TRUE)
+                        if (!(inherits(auo,"try-error"))){
+                            if (length(auo$fstatistic[1])>0 &length(auo$fstatistic[2])>0 & length(auo$fstatistic[3])>0){
+                                lm.auo.pvalue <- pf(auo$fstatistic[1],auo$fstatistic[2],auo$fstatistic[3],lower.tail=FALSE)
+                                }
                             }
                         }
                     if (method == "glm" | method == "both"){
                         calmatrix <- cbind(round(haveratio),round(notratio))
-                        obs <- c(1:length(genoform))
-                        test1 <- try(glmer(calmatrix ~ as.character(as.matrix(lm.genoform)) +(1|obs),na.action = na.exclude,family=binomial),silent=TRUE)
-                        test2 <- try(glmer(calmatrix ~ 1 +(1|obs),na.action = na.exclude,family=binomial),silent=TRUE)
+                        obs <- c(1:length(lm.genoform))
+                        test1 <- try(suppressWarnings(glmer(calmatrix ~ lm.genoform +(1|obs),na.action = na.exclude,family=binomial)),silent=TRUE)
+                        test2 <- try(suppressWarnings(glmer(calmatrix ~ 1 +(1|obs),na.action = na.exclude,family=binomial)),silent=TRUE)
                         if (!( inherits(test1,"try-error") | inherits(test2,"try-error"))){
                                glm.auo.pvalue <- anova(test1,test2)$"Pr(>Chisq)"[2]
                                }
                         }
-                    if ((lm.auo.pvalue !="NaN" & lm.auo.pvalue !="NA") | (glm.auo.pvalue !="NaN" & glm.auo.pvalue !="NA")){
+                    if ((lm.auo.pvalue !="NaN" & lm.auo.pvalue !="NA") | (glm.auo.pvalue !="NaN" & glm.auo.pvalue !="NA") | method == "boxplot"){
                         perP <- "no sig"
                         if(length(mamean) == 2){
                             if(abs(mamean[1]-mamean[2])>0.1){
@@ -261,6 +263,9 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                 each.result <- c(rownames(samp.snp)[x],chrnum,tar.ex,intron.range,splice.type,glm.auo.pvalue,perP,tx.gene[1,"GENEID"],"glm")
                                 result <- rbind(result,each.result)
                                 }
+                            if (method == "boxplot"){
+                                result[[tar.ex]] <- t(rbind(ratio,genoform))
+                                }
                             }
                         else if (total.locus["type",z]=="tri"){
                             if(y==1){
@@ -279,6 +284,9 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                     each.result <- c(rownames(samp.snp)[x],chrnum,tar.ex,total.locus["bigrange",z],splice.type,glm.auo.pvalue,perP,tx.gene[1,"GENEID"],"glm")
                                     result <- rbind(result,each.result)
                                     }
+                                if (method == "boxplot"){
+                                    result[[tar.ex]] <- t(rbind(ratio,genoform))
+                                    }
                                 }
                             else if(y==2){
                                 tar.ex <- paste(ex.start[ex.end == junc2],ex.end[ex.end == junc2],sep="-")[1]
@@ -295,6 +303,9 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                 if (glm.auo.pvalue !="NaN" & glm.auo.pvalue !="NA"){
                                     each.result <- c(rownames(samp.snp)[x],chrnum,tar.ex,total.locus["bigrange",z],splice.type,glm.auo.pvalue,perP,tx.gene[1,"GENEID"],"glm")
                                     result <- rbind(result,each.result)
+                                    }
+                                if (method == "boxplot"){
+                                    result[[tar.ex]] <- t(rbind(ratio,genoform))
                                     }
                                 }
                             }

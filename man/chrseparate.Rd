@@ -34,5 +34,5 @@ Seonggyun Han, Sangsoo Kim
 \examples{
 sampleDB <- system.file("extdata", "sampleDB", package="IVAS")
 sample.Txdb <- loadDb(sampleDB)
-filtered.txdb <- chrseparate(sample.Txdb,6)
+filtered.txdb <- chrseparate(sample.Txdb,1)
 }

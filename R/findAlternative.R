@@ -22,8 +22,8 @@ findAlternative <- function(geneid=NULL,txTable=NULL,totalExrange=NULL,totalInra
         intronName <- intronName[!is.element(intronName,nosigintron)]
         intronrange <- strsplit(intronName,"-")
         In.table <- do.call(rbind,intronrange)
-        colnames(In.table) <- c("start","end")
         if (length(intronrange) >0 ){
+            colnames(In.table) <- c("start","end")
             irange <- IRanges(start=as.integer(In.table[,"start"]),end=as.integer(In.table[,"end"]))
             alterIntron <- GRanges(seqnames=Rle(one.chr),ranges=irange,strand=strandinfo)
             return.value <- list(alterIntron,tableBygene,each.exon,each.intron)

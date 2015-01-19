@@ -9,10 +9,10 @@ snplocus
 }
 \usage{data("samplesnplocus")}
 \format{
-  A data frame with 10 SNPs and locus of them
+  A data frame with 11 SNPs and locus of them
 }
 \value{
-  A data frame with 10 SNPs and locus of them
+  A data frame with 11 SNPs and locus of them
 }
 \examples{
 data(samplesnplocus)

@@ -48,10 +48,10 @@ Seonggyun Han, Sangsoo Kim
 \examples{
 sampleDB <- system.file("extdata", "sampleDB", package="IVAS")
 sample.Txdb <- loadDb(sampleDB)
-filtered.txdb <- chrseparate(sample.Txdb,6)
+filtered.txdb <- chrseparate(sample.Txdb,1)
 trans.exon.range <- exonsBy(filtered.txdb,by="tx")
 trans.intron.range <- intronsByTranscript(filtered.txdb)
 txTable <- select(filtered.txdb, keys=names(trans.exon.range),
 columns=c("TXID","TXNAME","GENEID","TXSTART","TXEND"), keytype="TXID")
-Altvalue <- findAlternative("ENSG00000196735",txTable,trans.exon.range,trans.intron.range,6)
+Altvalue <- findAlternative("ENSG00000117335",txTable,trans.exon.range,trans.intron.range,1)
 }
