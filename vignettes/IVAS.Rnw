@@ -136,7 +136,7 @@ overlapsnp
 Using the output data from the \Rfunction{Altvalue} function and the \Rfunction{overlapsnp} function, significant SNPs affecting the alternative splicing can be identified by the sqtlfinder function.
 <<sqtlfinder function>>=
 sqtl.result <- sqtlfinder(Altvalue,overlapsnp,sampleexp,samplesnp,"lm")
-sqtl.result[2,]
+sqtl.result[1,]
 @
 In this example, We will run the function with the linear regression model.
 
@@ -152,10 +152,10 @@ final.result <- MsqtlFinder(sampleexp,samplesnp,samplesnplocus,sample.Txdb,"lm",
 
 To visualize the results into boxplot, the  \Rpackage{IVAS} package provides the saveBplot function. Using the dataframe from the output of \Rfunction{sqtlfinder} or \Rfunction{MsqtlFinder} function, we can make the boxplot.
 <<saveBplot function, results=hide>>=
-saveBplot(sqtl.result[2,],sampleexp,samplesnp,samplesnplocus,filtered.txdb,"./result")
+saveBplot(sqtl.result[1,],sampleexp,samplesnp,samplesnplocus,filtered.txdb,"./result")
 @
 \begin{center}
-\includegraphics[width=0.6\textwidth]{ENSG00000117335_rs2724360_lm.png}
+\includegraphics[width=0.6\textwidth]{ENSG00000117335_rs2488259_lm.png}
 \end{center}
 
 The output png files are saved in "result" folder.
