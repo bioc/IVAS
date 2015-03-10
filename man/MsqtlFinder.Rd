@@ -8,7 +8,7 @@
 }
 \usage{
 MsqtlFinder(expdata = NULL, snpdata = NULL, snplocus = NULL, GTFdata = NULL,
-met = NULL, Ncor = 1, bplotout = NULL)
+met = NULL, Ncor = 1, bplotout = NULL, cutFDR = 0.01)
 }
 \arguments{
   \item{expdata}{
@@ -31,6 +31,9 @@ met = NULL, Ncor = 1, bplotout = NULL)
 }
   \item{bplotout}{
   A directory saving boxplots
+}  
+  \item{cutFDR}{
+  The false discovery rate value you would like to set threshold.
 }
 }
 \value{

@@ -102,7 +102,7 @@ The \Rfunction{chrseparate} function separates the \Robject{TxDb} object based o
 \\
 To use this function : 
 <<chrseparate function>>=
-filtered.txdb <- chrseparate(sample.Txdb,1)
+filtered.txdb <- chrseparate(sample.Txdb,19)
 filtered.txdb
 @
 In this example, We filter the \Robject{TxDb} object with only the chromosome 6.
@@ -114,19 +114,19 @@ trans.exon.range <- exonsBy(filtered.txdb,by="tx")
 trans.intron.range <- intronsByTranscript(filtered.txdb)
 txTable <- select(filtered.txdb, keys=names(trans.exon.range),
                   columns=c("TXID","TXNAME","GENEID","TXSTART","TXEND"),keytype="TXID")
-Altvalue <- findAlternative("ENSG00000117335",txTable,trans.exon.range,
-                            trans.intron.range,1)
+Altvalue <- findAlternative("ENSG00000170889",txTable,trans.exon.range,
+                            trans.intron.range,19)
 Altvalue
 @
-In this example, we will search SQTLs in the ENSG00000117335.
+In this example, we will search SQTLs in the ENSG00000170889.
 
 \subsection{Finding SNPs which belongs to alternative exons and flanking introns}
 The \Rfunction{overlapsnp} function searches SNPs in alternative exons and the flanking introns.
 <<overlapsnp function>>=
-ch.snp.locus <- as.matrix(samplesnplocus[samplesnplocus[,2] == 1,])
+ch.snp.locus <- as.matrix(samplesnplocus[samplesnplocus[,2] == 19,])
 ch.snps <- matrix(ch.snp.locus[is.element(ch.snp.locus[,1],rownames(samplesnp)),],
                   ncol=3,byrow=FALSE)
-ch.snps.range <- GRanges(seqnames=Rle(1),ranges=IRanges(start=as.integer(ch.snps[,3]),
+ch.snps.range <- GRanges(seqnames=Rle(19),ranges=IRanges(start=as.integer(ch.snps[,3]),
                          end=as.integer(ch.snps[,3])),metadata=ch.snps[,1])
 overlapsnp <- findOversnp(Altvalue,ch.snps.range)
 overlapsnp
@@ -136,7 +136,7 @@ overlapsnp
 Using the output data from the \Rfunction{Altvalue} function and the \Rfunction{overlapsnp} function, significant SNPs affecting the alternative splicing can be identified by the sqtlfinder function.
 <<sqtlfinder function>>=
 sqtl.result <- sqtlfinder(Altvalue,overlapsnp,sampleexp,samplesnp,"lm")
-sqtl.result[1,]
+sqtl.result
 @
 In this example, We will run the function with the linear regression model.
 
@@ -152,10 +152,10 @@ final.result <- MsqtlFinder(sampleexp,samplesnp,samplesnplocus,sample.Txdb,"lm",
 
 To visualize the results into boxplot, the  \Rpackage{IVAS} package provides the saveBplot function. Using the dataframe from the output of \Rfunction{sqtlfinder} or \Rfunction{MsqtlFinder} function, we can make the boxplot.
 <<saveBplot function, results=hide>>=
-saveBplot(sqtl.result[1,],sampleexp,samplesnp,samplesnplocus,filtered.txdb,"./result")
+saveBplot(sqtl.result,sampleexp,samplesnp,samplesnplocus,filtered.txdb,"./result")
 @
 \begin{center}
-\includegraphics[width=0.6\textwidth]{ENSG00000117335_rs2488259_lm.png}
+\includegraphics[width=0.6\textwidth]{ENSG00000170889_54704610-54704756_rs3810232(13)_lm.png}
 \end{center}
 
 The output png files are saved in "result" folder.

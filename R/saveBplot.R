@@ -37,7 +37,8 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
             sig.snp <- GRanges(seqnames=Rle(snp.chr),ranges=irange,metadata=as.character(unlist(each.snplocus["SNP"])))
             overlapsnp <- findOversnp(Altinfo,sig.snp)
             group.matrix <- sqtlfinder(Altinfo,overlapsnp,expdata,sub.snpdata,"boxplot")
-            group.matrix <- group.matrix[[each.sig.gene["targetExon"]]]
+            log.p <- round(-1*log10(as.double(each.sig.gene["P.value"])),4)
+            group.matrix <- group.matrix[[paste(each.sig.gene["targetExon"],log.p,sep="-")]]
             ratio <- as.double(group.matrix[,"ratio"])
             names(ratio) <- rownames(group.matrix)
             rsname <- colnames(group.matrix)[2]
@@ -61,9 +62,9 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
                 }
             boxmatrix <- cbind(as.double(ratio),as.character(geno))
             colnames(boxmatrix) <- c("ratio","geno")
-            png(filename=paste(outdir,"/",each.sig.gene["gene"],"_",rsname,"_",each.sig.gene["method"],".png",sep=""))
+            png(filename=paste(outdir,"/",each.sig.gene["gene"],"_",each.sig.gene[3],"_",rsname,"(",round(log.p),")","_",each.sig.gene["method"],".png",sep=""))
             boxplot(as.double(ratio)~as.character(geno),xlab=(paste("geneID : ",as.character(each.sig.gene["gene"]),sep="")))
             dev.off()
             }
         }
-    }
+    } 

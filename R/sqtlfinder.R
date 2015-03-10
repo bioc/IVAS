@@ -77,6 +77,7 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                     sqtl.result <- calSignificant(tx.gene,t(unique(t(total.locus))),exon.locus,intron.locus,strandinfo,overapvalue,Nchr,expdata,snpdata,method)
                     predictedSQTL <- rbind(predictedSQTL,sqtl.result)
                     if (method == "boxplot"){
+                        predictedSQTL <- NULL
                         add.name <- names(sqtl.result)[!is.element(names(sqtl.result),names(box.mat))]
                         if (length(add.name) >0){
                             for (p in 1:length(add.name)){
@@ -100,6 +101,7 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                     sqtl.result <- calSignificant(tx.gene,t(unique(t(total.locus))),exon.locus,intron.locus,strandinfo,overapvalue,Nchr,expdata,snpdata,method)
                     predictedSQTL <- rbind(predictedSQTL,sqtl.result)
                     if (method == "boxplot"){
+                        predictedSQTL <- NULL
                         add.name <- names(sqtl.result)[!is.element(names(sqtl.result),names(box.mat))]
                         if (length(add.name) >0){
                             for (p in 1:length(add.name)){
@@ -185,6 +187,7 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                     sqtl.result <- calSignificant(tx.gene,t(unique(t(total.locus))),exon.locus,intron.locus,strandinfo,overapvalue,Nchr,expdata,snpdata,method)
                     predictedSQTL <- rbind(predictedSQTL,sqtl.result)
                     if (method == "boxplot"){
+                        predictedSQTL <- NULL
                         add.name <- names(sqtl.result)[!is.element(names(sqtl.result),names(box.mat))]
                         if (length(add.name) >0){
                             for (p in 1:length(add.name)){
@@ -212,6 +215,7 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                     sqtl.result <- calSignificant(tx.gene,total.locus,exon.locus,intron.locus,strandinfo,overapvalue,Nchr,expdata,snpdata,method)
                     predictedSQTL <- rbind(predictedSQTL,sqtl.result)
                     if (method == "boxplot"){
+                        predictedSQTL <- NULL
                         add.name <- names(sqtl.result)[!is.element(names(sqtl.result),names(box.mat))]
                         if (length(add.name) >0){
                             for (p in 1:length(add.name)){
@@ -223,7 +227,7 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                 }
             }
         }
-    if (method == "boxplot" & length(predictedSQTL) != 0){
+    if (method == "boxplot"){# & length(predictedSQTL) == 0){
         return (box.mat)
         }
     if (method != "boxplot" & length(predictedSQTL) != 0){

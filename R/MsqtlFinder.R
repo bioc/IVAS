@@ -1,4 +1,4 @@
-MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met=NULL,Ncor=1,bplotout=NULL){
+MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met=NULL,Ncor=1,bplotout=NULL,cutFDR=0.01){
     snp.cn <- colnames(snpdata)
     exp.cn <- colnames(expdata)
     over.exp <- expdata[,is.element(colnames(expdata),snp.cn)]
@@ -55,7 +55,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
     if (met == "lm" | met == "both"){
         lm.predictSQTL <- predictSQTL[which(predictSQTL[,"method"] == "lm"),]
         fdr.p <- p.adjust(lm.predictSQTL[,"P.value"],method="fdr",n=length(lm.predictSQTL[,"P.value"]))
-        fdr.sig <- which(as.double(fdr.p) < 0.01)
+        fdr.sig <- which(as.double(fdr.p) < cutFDR)
         lm.sig.sqtl <- matrix(lm.predictSQTL[fdr.sig,],ncol=ncol(lm.predictSQTL))
         colnames(lm.sig.sqtl) <- colnames(predictSQTL)
         lm.sig.sqtl <- unique(lm.sig.sqtl[which(lm.sig.sqtl[,"per.P.value"]=="sig"),])
@@ -64,7 +64,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
     if (met == "glm" | met == "both"){
         glm.predictSQTL <- predictSQTL[which(predictSQTL[,"method"] == "glm"),]
         fdr.p <- p.adjust(glm.predictSQTL[,"P.value"],method="fdr",n=length(glm.predictSQTL[,"P.value"]))
-        fdr.sig <- which(as.double(fdr.p) < 0.01)
+        fdr.sig <- which(as.double(fdr.p) < cutFDR)
         glm.sig.sqtl <- matrix(glm.predictSQTL[fdr.sig,],ncol=ncol(glm.predictSQTL))
         colnames(glm.sig.sqtl) <- colnames(predictSQTL)
         glm.sig.sqtl <- unique(glm.sig.sqtl[which(glm.sig.sqtl[,"per.P.value"]=="sig"),])
@@ -76,7 +76,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         if (met == "glm" | met == "both"){saveBplot(glm.sig.sqtl,expdata,snpdata,snplocus,GTFdata,bplotout)}
         }
     total.sqtl <- rbind(lm.sig.sqtl,glm.sig.sqtl)
-    rownames(predictSQTL) <- c(1:nrow(predictSQTL))
+    rownames(total.sqtl) <- c(1:nrow(total.sqtl))
     colnames(total.sqtl) <- colnames(predictSQTL)
     return (total.sqtl)
     }
