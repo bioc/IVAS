@@ -7,13 +7,21 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
     expdata <- over.exp
     snpdata <- over.snp
     cal.snp <- is.element(snplocus[,"SNP"],rownames(snpdata))
+    GTF.exons <- exonsBy(GTFdata,by="tx")
+    len.chr <- grep("chr",as.character(seqnames(GTF.exons)[[1]]))
+    if (length(len.chr) != 0){
+        snplocus[,2] <- paste("chr",gsub("chr","",snplocus[,2]),sep="")
+        }
+    else if (length(len.chr) == 0){
+        snplocus[,2] <- gsub("chr","",snplocus[,2])
+        }
     sub.chr <- snplocus[cal.snp,"CHR"]
     chr <- unique(as.matrix(sub.chr))
     predictSQTL <- NULL
     registerDoParallel(cores=Ncor)
     for (j in 1:length(chr)){
         pa.result <- NULL
-        print (paste("chr",chr[j],":processing",sep=""))
+        print (paste("chr",gsub("chr","",chr[j]),":processing",sep=""))
         ch.snp.num <- snplocus[,"CHR"] == chr[j]
         ch.snp.locus <- as.matrix(snplocus[ch.snp.num,])
         over.snp <- is.element(ch.snp.locus[,"SNP"],rownames(snpdata))
@@ -28,6 +36,10 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         trans.intron.range <- intronsByTranscript(transdb)
         transnum <- names(trans.exon.range)
         txTable <- select(transdb, keys=transnum, columns=c("TXID","TXNAME","GENEID","TXSTART","TXEND"), keytype="TXID")
+        if (length(txTable) != 0){
+            txTable[,2] <- do.call(rbind,strsplit(txTable[,2],"[.]"))[,1]
+            txTable[,3] <- do.call(rbind,strsplit(txTable[,3],"[.]"))[,1]
+            }
         irange <- IRanges(start=as.integer(txTable[,"TXSTART"]),end=as.integer(txTable[,"TXEND"]))
         generange <- GRanges(seqnames=Rle(chr[j]),ranges=irange,metadata=txTable[,"GENEID"])
         over.gene <- as.matrix(findOverlaps(ch.snps.range,generange,select="all"))[,"subjectHits"]
@@ -52,7 +64,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         }
     lm.sig.sqtl <- NULL
     glm.sig.sqtl <- NULL
-    if (met == "lm" | met == "both"){
+    if ((met == "lm" | met == "both") & is.element("lm",predictSQTL[,"method"])){
         lm.predictSQTL <- predictSQTL[which(predictSQTL[,"method"] == "lm"),]
         fdr.p <- p.adjust(lm.predictSQTL[,"P.value"],method="fdr",n=length(lm.predictSQTL[,"P.value"]))
         fdr.sig <- which(as.double(fdr.p) < cutFDR)
@@ -61,7 +73,7 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         lm.sig.sqtl <- unique(lm.sig.sqtl[which(lm.sig.sqtl[,"per.P.value"]=="sig"),])
         lm.sig.sqtl <- matrix(lm.sig.sqtl,ncol=10)
         }
-    if (met == "glm" | met == "both"){
+    if ((met == "glm" | met == "both") & is.element("glm",predictSQTL[,"method"])){
         glm.predictSQTL <- predictSQTL[which(predictSQTL[,"method"] == "glm"),]
         fdr.p <- p.adjust(glm.predictSQTL[,"P.value"],method="fdr",n=length(glm.predictSQTL[,"P.value"]))
         fdr.sig <- which(as.double(fdr.p) < cutFDR)
@@ -75,9 +87,11 @@ MsqtlFinder <- function(expdata=NULL,snpdata=NULL,snplocus=NULL,GTFdata=NULL,met
         if (met == "lm" | met == "both"){saveBplot(lm.sig.sqtl,expdata,snpdata,snplocus,GTFdata,bplotout)}
         if (met == "glm" | met == "both"){saveBplot(glm.sig.sqtl,expdata,snpdata,snplocus,GTFdata,bplotout)}
         }
-    total.sqtl <- rbind(lm.sig.sqtl,glm.sig.sqtl)
-    rownames(total.sqtl) <- c(1:nrow(total.sqtl))
-    colnames(total.sqtl) <- colnames(predictSQTL)
+    if(length(lm.sig.sqtl) >0 | length(glm.sig.sqtl) >0){
+        total.sqtl <- rbind(lm.sig.sqtl,glm.sig.sqtl)
+        rownames(total.sqtl) <- c(1:nrow(total.sqtl))
+        colnames(total.sqtl) <- colnames(predictSQTL)
+        }
     return (total.sqtl)
     }
 

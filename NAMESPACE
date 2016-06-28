@@ -8,10 +8,10 @@ importFrom(AnnotationDbi,select)
 importFrom(GenomicFeatures,exonsBy,intronsByTranscript,isActiveSeq,"isActiveSeq<-")
 importFrom(GenomicRanges,GRanges,elementMetadata)
 importFrom(IRanges,IRanges,findOverlaps)
-importFrom(BiocGenerics,strand)
+importFrom(BiocGenerics,strand,unlist)
 importFrom(GenomeInfoDb,seqinfo,seqlevels)
 importMethodsFrom(Matrix,as.matrix)
-importMethodsFrom(BiocGenerics,unlist)
+#importMethodsFrom(BiocGenerics)
 importMethodsFrom(S4Vectors,Rle)
 
 

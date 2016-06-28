@@ -11,10 +11,20 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
         colnames(sig.sqtl) <- h.name
         sig.sqtl <- gsub(" ","",sig.sqtl)
         }
-    Nchr <- unique(sig.sqtl[,"CHR"])
     if (file.exists(outdir) == "FALSE"){
         dir.create(outdir)
         }
+    GTF.exons <- exonsBy(GTFdata,by="tx")
+    len.chr <- grep("chr",as.character(seqnames(GTF.exons)[[1]]))
+    if (length(len.chr) != 0){
+        snplocus[,2] <- paste("chr",gsub("chr","",snplocus[,2]),sep="")
+	sig.sqtl[,2] <- paste("chr",gsub("chr","",sig.sqtl[,2]),sep="")
+        }
+    else if (length(len.chr) == 0){
+	snplocus[,2] <- gsub("chr","",snplocus[,2])
+	sig.sqtl[,2] <- gsub("chr","",sig.sqtl[,2])
+	}
+    Nchr <- unique(sig.sqtl[,"CHR"])
     sub.snp.locus <- snplocus[is.element(snplocus[,"SNP"],sig.sqtl[,"SNP"]),]
     sub.snpdata <- snpdata[is.element(rownames(snpdata),sig.sqtl[,"SNP"]),]
     for (n in 1:length(Nchr)){
@@ -25,6 +35,10 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
         exoninfo <- exonsBy(transdb,by="tx")
         introninfo <- intronsByTranscript(transdb)
         txTable <- select(transdb, keys=names(exoninfo), columns=c("TXID","TXNAME","GENEID","TXSTART","TXEND"), keytype="TXID")
+	if (length(txTable) != 0){
+            txTable[,2] <- do.call(rbind,strsplit(txTable[,2],"[.]"))[,1]
+            txTable[,3] <- do.call(rbind,strsplit(txTable[,3],"[.]"))[,1]
+            }
         for (s in 1:nrow(each.sig.sqtl)){
             each.sig.gene <- each.sig.sqtl[s,]
             names(each.sig.gene) <- colnames(sig.sqtl)
@@ -44,6 +58,9 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
             rsname <- colnames(group.matrix)[2]
             geno <- group.matrix[,rsname]
             geno.names <- names(geno)
+            if (length(geno) ==0 ){
+		next
+		}
             alleles <- names(table(as.matrix(geno)))
             hetero <- sapply(alleles,function(z){
                 allele <- strsplit(z,"")[[1]]
@@ -63,7 +80,7 @@ saveBplot <- function(sig.sqtl=NULL,expdata=NULL,snpdata=NULL,snplocus=NULL,GTFd
             boxmatrix <- cbind(as.double(ratio),as.character(geno))
             colnames(boxmatrix) <- c("ratio","geno")
             png(filename=paste(outdir,"/",each.sig.gene["gene"],"_",each.sig.gene[3],"_",rsname,"(",round(log.p),")","_",each.sig.gene["method"],".png",sep=""))
-            boxplot(as.double(ratio)~as.character(geno),xlab=(paste("geneID : ",as.character(each.sig.gene["gene"]),sep="")))
+            boxplot(as.double(ratio)~as.character(geno),xlab=(paste("geneID : ",as.character(each.sig.gene["gene"]),sep="")),ylim=c(0,1))
             dev.off()
             }
         }

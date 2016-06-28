@@ -32,8 +32,8 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
         tx.gene.start <- tx.gene[fi.tx.eval | se.tx.eval,]
         target.snp <- oversnp.mat[which(oversnp.mat[,"range"] == total.locus["bigrange",z]),"snp"]
         samp.snp <- snpdata[is.element(rownames(snpdata),unique(c(target.snp,ad.snp))),]
-        if (nrow(samp.snp) == 0){next}
-        if (total.locus["type",z]=="AS"){
+        if (length(samp.snp) == 0){next}
+        if (total.locus["type",z]=="AS"){ 
             tx.gene.name <- NULL
             int.cal.start <- strsplit(intron.locus[grep(cal.start,intron.locus)],"-")
             int.cal.end <- strsplit(intron.locus[grep(cal.end,intron.locus)],"-")
@@ -58,6 +58,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             tx.gene.name <- unlist(c(over.st.name,over.en.name))
             tx.gene.start <- na.omit(tx.gene[unique(tx.gene.name),])
             nextstart <- "not"
+            split.start <- "NA"
             if (z < Nmax){
                 tx.gene.start <- tx.gene.start[(cal.end >= tx.gene.start[,"TXSTART"] & cal.end <= tx.gene.start[,"TXEND"]),]
                 grep.intron <- grep(cal.end,intron.locus)
@@ -70,7 +71,9 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                         nextstart <- unique(do.call(rbind,next.intron)[,1])
                         split.start <- unique(do.call(rbind,next.intron)[,2])
                         }
-                    else {nextstart <- "not"}
+                    else {
+                        nextstart <- "not"
+                        }
                     }
                 cal.intron <- names(intron.locus[grep.intron])
                 next.intron <- names(intron.locus[grep(nextstart[1],intron.locus)])
@@ -178,17 +181,20 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             not.int <- list(tx.gene.start[!is.element(tx.gene.start[,"TXNAME"],have.int[[1]]),"TXNAME"])
             }
         for (y in 1:length(have.int)){
-            have.exp <- na.omit(expdata[have.int[[y]],])
-            not.exp <- na.omit(expdata[not.int[[y]],])
+            inter.have <- intersect(rownames(expdata),have.int[[y]])
+            inter.not <- intersect(rownames(expdata),not.int[[y]])
+            have.exp <- na.omit(expdata[is.element(rownames(expdata),inter.have),])
+            not.exp <- na.omit(expdata[is.element(rownames(expdata),inter.not),])
+            if (length(have.exp) == 0 | length(not.exp) == 0){next}
             sum.have.exp <- apply(have.exp,2,sum)
             sum.not.exp <- apply(not.exp,2,sum)
-            sum.have.exp.me <- median(sum.have.exp)
-            sum.not.exp.me <- median(sum.not.exp)
+            sum.have.exp.me <- median(as.double(sum.have.exp))
+            sum.not.exp.me <- median(as.double(sum.not.exp))
             if (sum.have.exp.me < 0.3 & sum.not.exp.me < 0.3){next}
             ratio <- sum.have.exp/(sum.have.exp+sum.not.exp)
             notratio <- sum.not.exp/(sum.have.exp+sum.not.exp)*100
             haveratio <- sum.have.exp/(sum.have.exp+sum.not.exp)*100
-            realNA <- names(haveratio[haveratio!="NaN" & notratio!="NaN"])
+            realNA <- names(haveratio[!is.element(haveratio,"NaN") & !is.element(notratio,"NaN")])
             ratio <- ratio[realNA]
             notratio <- notratio[realNA]
             haveratio <- haveratio[realNA]
@@ -199,7 +205,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
             haveratio <- haveratio[colnames(resnp)]
             for (x in 1:nrow(samp.snp)){
                 samp.form <- as.character(as.matrix(samp.snp[x,realNA]))
-                if (length(unique(samp.form))>1 & nrow(have.exp) >0 & nrow(not.exp)>0){
+                if (length(unique(samp.form))>1 & length(inter.have) >0 & length(inter.not)>0){
                     genoform <- as.matrix(resnp[x,])
                     lm.geno <- unique(unlist(strsplit(rownames(table(genoform)),"")))
                     if(length(lm.geno)==2){
@@ -295,6 +301,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                 }
                             if (method == "boxplot"){
                                 test.name <- c(paste(tar.ex,log.p.l,sep="-"),paste(tar.ex,log.p.gl,sep="-"))
+                                test.name <- test.name[-grep("NaN",test.name)]
                                 if (length(names(result)[is.element(names(result),test.name)]) == 0){
                                     result[[paste(tar.ex,log.p.l,sep="-")]] <- t(rbind(ratio,genoform))
                                     result[[paste(tar.ex,log.p.gl,sep="-")]] <- t(rbind(ratio,genoform))
@@ -320,6 +327,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                     }
                                 if (method == "boxplot"){
                                     test.name <- c(paste(tar.ex,log.p.l,sep="-"),paste(tar.ex,log.p.gl,sep="-"))
+                                    test.name <- test.name[-grep("NaN",test.name)]
                                     if (length(names(result)[is.element(names(result),test.name)]) == 0){
                                         result[[paste(tar.ex,log.p.l,sep="-")]] <- t(rbind(ratio,genoform))
                                         result[[paste(tar.ex,log.p.gl,sep="-")]] <- t(rbind(ratio,genoform))
@@ -344,6 +352,7 @@ calSignificant <- function(tx.gene=NULL,total.locus=NULL,exon.locus=NULL,intron.
                                     }
                                 if (method == "boxplot"){
                                     test.name <- c(paste(tar.ex,log.p.l,sep="-"),paste(tar.ex,log.p.gl,sep="-"))
+                                    test.name <- test.name[-grep("NaN",test.name)]
                                     if (length(names(result)[is.element(names(result),test.name)]) == 0){
                                         result[[paste(tar.ex,log.p.l,sep="-")]] <- t(rbind(ratio,genoform))
                                         result[[paste(tar.ex,log.p.gl,sep="-")]] <- t(rbind(ratio,genoform))

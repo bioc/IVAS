@@ -1,12 +1,17 @@
 Package: IVAS
 Type: Package
-Title: Identification of genetic Variants affecting Alternative Splicing
-Version: 1.5.0
+Title: Identification of genetic Variants affecting Alternative
+        Splicing
+Version: 1.5.1
 Author: Seonggyun Han, Sangsoo Kim
 Maintainer: Seonggyun Han <hangost@ssu.ac.kr>
 Description: Identification of genetic variants affecting alternative splicing.
 License: GPL-2
 Depends: R (> 3.0.0),GenomicFeatures
-Imports: doParallel, lme4, Matrix, BiocGenerics, GenomicRanges, IRanges, foreach, AnnotationDbi, S4Vectors, GenomeInfoDb
+Imports: doParallel, lme4, Matrix, BiocGenerics, GenomicRanges,
+        IRanges, foreach, AnnotationDbi, S4Vectors, GenomeInfoDb
 Suggests: BiocStyle
-biocViews: AlternativeSplicing, DifferentialExpression, DifferentialSplicing, GeneExpression, GeneRegulation, Regression, RNASeq, Sequencing, SNP, Software, Transcription
+biocViews: AlternativeSplicing, DifferentialExpression,
+        DifferentialSplicing, GeneExpression, GeneRegulation,
+        Regression, RNASeq, Sequencing, SNP, Software, Transcription
+

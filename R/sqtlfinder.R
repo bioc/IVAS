@@ -47,11 +47,12 @@ sqtlfinder <- function(altInvalue=NULL,overapvalue=NULL,expdata=NULL,snpdata=NUL
                 ex.ranges <- unique(names(exon.locus))
                 not.ex.name <- ex.ranges[!is.element(ex.ranges,havename)]
                 overnotname <- exon.locus[is.element(names(exon.locus),as.character(not.ex.name))]
-                se.over.name <- grep(paste(secondend,collapse="|"),overnotname)
-                fi.over.name <- grep(paste(firststart,collapse="|"),overnotname)
-                NInum <- unique(c(se.over.name,fi.over.name))
+                se.over.name <- overnotname[grep(paste(secondend,collapse="|"),overnotname)]
+                fi.over.name <- overnotname[grep(paste(firststart,collapse="|"),overnotname)]
+                if (length(se.over.name) ==0 | length(fi.over.name) ==0){next}
+		NI.exon <- paste(do.call(rbind,strsplit(fi.over.name,"-"))[,1],do.call(rbind,strsplit(se.over.name,"-"))[,2],sep="-")
                 rownames(total.locus) <- c("bigrange","type")
-                if (length(NInum) !=0){
+                if (length(NI.exon[is.element(NI.exon,exon.locus)]) !=0){
                     sqtl.result <- calSignificant(tx.gene,t(unique(t(total.locus))),exon.locus,intron.locus,strandinfo,overapvalue,Nchr,expdata,snpdata,method)
                     predictedSQTL <- rbind(predictedSQTL,sqtl.result)
                     if (method == "boxplot"){
