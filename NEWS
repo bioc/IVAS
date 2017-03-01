@@ -1,7 +1,9 @@
 Package : IVAS
 =========================
-Update 1.5.1
-- Debug error when result is NULL in the MsqtlFinder.
+Update 1.8.0
+- Defunct MsqtlFinder, calSignificant, and sqtlfinder.
 - Adjust Chr names between GTF and SNP locus data.
 - Change test of UTR region.
-- Debug error in Boxplot, calSignificant and sqtlfinder.
+- sqtl finder reform
+- Create new functions (RatioFromFPKM, Splicingfinder, and sQTLFinder)
+- Create ASclass object

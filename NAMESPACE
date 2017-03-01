@@ -1,20 +1,45 @@
 #Import packages dependencies
-#import(foreach)
-#import(GenomicFeatures)
+import(GenomicFeatures)
+import(ggplot2)
+import(BiocParallel)
+import(methods)
+import(Matrix)
+
+import(ggfortify)
 importFrom(doParallel,registerDoParallel)
 importFrom(lme4,glmer)
 importFrom(foreach,foreach,"%dopar%")
 importFrom(AnnotationDbi,select)
 importFrom(GenomicFeatures,exonsBy,intronsByTranscript,isActiveSeq,"isActiveSeq<-")
 importFrom(GenomicRanges,GRanges,elementMetadata)
-importFrom(IRanges,IRanges,findOverlaps)
+importFrom(IRanges,IRanges,findOverlaps,start,end)
 importFrom(BiocGenerics,strand,unlist)
-importFrom(GenomeInfoDb,seqinfo,seqlevels)
+importFrom(GenomeInfoDb,seqinfo,seqlevels,seqnames)
+importFrom(utils,write.table,methods)
+importFrom(methods,slot,new,setClass,representation,setMethod,slotNames)
+
+
+
+importFrom(grDevices,png,dev.off)
+importFrom(stats,chisq.test,median,lm,pf,na.exclude,binomial,anova,pchisq,kmeans,p.adjust)
 importMethodsFrom(Matrix,as.matrix)
-#importMethodsFrom(BiocGenerics)
+
+#importMethodsFrom(utils,methods,slot,new,setClass,representation,setMethod,slotNames)
+importMethodsFrom(BiocGenerics)
 importMethodsFrom(S4Vectors,Rle)
 
 
 #Export all names
-export(calSignificant,chrseparate,findAlternative,findOversnp,MsqtlFinder,saveBplot,sqtlfinder)
+export(
+chrseparate,
+findAlternative,
+findOversnp,
+saveBplot,
+sQTLsFinder,
+Splicingfinder,
+RatioFromFPKM,
+calSignificant,  # defunct
+MsqtlFinder,  # defunct
+sqtlfinder  # defunct
+)
 
