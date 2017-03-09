@@ -1,9 +1,9 @@
 \name{calSignificant}
 \alias{calSignificant}
 \title{
-  Deprecated
+    Deprecated
 }
 \description{
-  This function is deprecated and will be made defunct. Instead, use \code{\link{Splicingfinder}}.
+    This function is deprecated and will be made defunct. Instead, use \code{\link{Splicingfinder}}.
 }
 

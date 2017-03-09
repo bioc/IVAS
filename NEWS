@@ -5,5 +5,9 @@ Update 1.8.0
 - Adjust Chr names between GTF and SNP locus data.
 - Change test of UTR region.
 - sqtl finder reform
-- Create new functions (RatioFromFPKM, Splicingfinder, and sQTLFinder)
+- Create new functions (RatioFromFPKM, Splicingfinder, and sQTLsFinder)
 - Create ASclass object
+
+Update 1.9.0
+- Modify RatioFromFPKM, Splicingfinder, and sQTLsFinder
+- Modify manual and tutorial

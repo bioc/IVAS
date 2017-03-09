@@ -4,7 +4,6 @@ import(ggplot2)
 import(BiocParallel)
 import(methods)
 import(Matrix)
-
 import(ggfortify)
 importFrom(doParallel,registerDoParallel)
 importFrom(lme4,glmer)
@@ -18,12 +17,9 @@ importFrom(GenomeInfoDb,seqinfo,seqlevels,seqnames)
 importFrom(utils,write.table,methods)
 importFrom(methods,slot,new,setClass,representation,setMethod,slotNames)
 
-
-
 importFrom(grDevices,png,dev.off)
 importFrom(stats,chisq.test,median,lm,pf,na.exclude,binomial,anova,pchisq,kmeans,p.adjust)
 importMethodsFrom(Matrix,as.matrix)
-
 #importMethodsFrom(utils,methods,slot,new,setClass,representation,setMethod,slotNames)
 importMethodsFrom(BiocGenerics)
 importMethodsFrom(S4Vectors,Rle)
@@ -31,15 +27,16 @@ importMethodsFrom(S4Vectors,Rle)
 
 #Export all names
 export(
-chrseparate,
-findAlternative,
-findOversnp,
-saveBplot,
-sQTLsFinder,
-Splicingfinder,
-RatioFromFPKM,
-calSignificant,  # defunct
-MsqtlFinder,  # defunct
-sqtlfinder  # defunct
+  chrseparate,
+  findAlternative,
+  findOversnp,
+  saveBplot,
+  sQTLsFinder,
+  Splicingfinder,
+  CalSigSNP,
+  RatioFromFPKM,
+  calSignificant,  # defunct
+  MsqtlFinder,  # defunct
+  sqtlfinder  # defunct
 )
 
