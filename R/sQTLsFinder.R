@@ -1,4 +1,5 @@
 sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSam=NULL,method="lm",CalIndex=NULL,Ncor=1,out.dir=NULL){
+    cal.met <- method
     total.result <- NULL
     Exon.ratio.mat <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))
     names(Exon.ratio.mat) <- c("ES","ASS","IR")
@@ -72,7 +73,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                                 test.snpdata <- rbind(ch.snp.data[inter.snp,over.samples])
                                 rownames(test.snpdata) <- inter.snp
                                 test.snplocus <- rbind(ch.snp.locus[is.element(ch.snp.locus[,"SNP"],overlapsnp[,"snp"]),])
-                                sig.result <- CalSigSNP(test.expdata,test.snpdata,overlapsnp,test.snplocus,Total.chr[j],each.sub.exon.ratio[,"EnsID"],method=method)
+                                sig.result <- CalSigSNP(test.expdata,test.snpdata,overlapsnp,test.snplocus,Total.chr[j],each.sub.exon.ratio[,"EnsID"],NULL,cal.met)
                                 if (method == "boxplot")    sig.result
                                 else if (method != "boxplot" & length(sig.result) != 0){
                                     inter.cn <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX","UpEX","Types","Diff.P","ShortEX","LongEX","NeighborEX","ShortNeighborEX","LongNeighborEX","RetainEX")
