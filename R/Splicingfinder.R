@@ -1,4 +1,4 @@
-Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=NULL){
+﻿Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=NULL){
     NItest <- function(exon.info,intron.info,alt.intron.info,tx.gene=NULL){
         NI.exons <- NULL
         alt.intron.info <- alt.intron.info[1,]
@@ -711,10 +711,12 @@ Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=N
         names(final.result.list) <- total.list.names
         cluster.result <- list(NULL,NULL,NULL)
         names(cluster.result) <- c("ES","ASS","IR")
-        for (each.list.num in 1:length(final.result.list)){
-            result.type <- unlist(strsplit(names(final.result.list[each.list.num]),"[.]"))[1]
-            cluster.result[[result.type]] <- unique(rbind(cluster.result[[result.type]],final.result.list[[each.list.num]]))
+        if (!is.null(final.result.list)){
+            for (each.list.num in 1:length(final.result.list)){
+                result.type <- unlist(strsplit(names(final.result.list[each.list.num]),"[.]"))[1]
+                cluster.result[[result.type]] <- unique(rbind(cluster.result[[result.type]],final.result.list[[each.list.num]]))
             }
+        }
         if (length(cluster.result[["ES"]]) != 0){
             row.names(cluster.result[["ES"]]) <- 1:nrow(rbind(cluster.result[["ES"]]))
             cluster.result[["ES"]] <- cbind(unique(tx.gene[,"GENEID"]),unique(tx.gene[,"TXCHROM"]),unique(tx.gene[,"TXSTRAND"]),cluster.result[["ES"]])

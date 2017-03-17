@@ -1,5 +1,4 @@
 sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSam=NULL,method="lm",CalIndex=NULL,Ncor=1,out.dir=NULL){
-    cal.met <- method
     total.result <- NULL
     Exon.ratio.mat <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))
     names(Exon.ratio.mat) <- c("ES","ASS","IR")
@@ -32,7 +31,10 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
     if (length(Total.snpdata) != 0){
         Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
         total.result <- NULL
-        final.result <- lapply(subtypes,function(each.type){
+        final.result <- lapply(paste(subtypes,method,sep="-"),function(each.type){
+            each.type <- unlist(strsplit(each.type,"-"))
+            cal.met <- each.type[2]
+            each.type <- each.type[1]
             sub.exon.ratio.mat <- gsub(" ","",as.matrix(Exon.ratio.mat[[each.type]]))
             sub.snplocus <- rbind(Total.snplocus[is.element(Total.snplocus[,"CHR"],unique(sub.exon.ratio.mat[,"Nchr"])),])
             inter.snp <- intersect(rownames(Total.snpdata),sub.snplocus[,"SNP"])
@@ -73,7 +75,8 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                                 test.snpdata <- rbind(ch.snp.data[inter.snp,over.samples])
                                 rownames(test.snpdata) <- inter.snp
                                 test.snplocus <- rbind(ch.snp.locus[is.element(ch.snp.locus[,"SNP"],overlapsnp[,"snp"]),])
-                                sig.result <- CalSigSNP(test.expdata,test.snpdata,overlapsnp,test.snplocus,Total.chr[j],each.sub.exon.ratio[,"EnsID"],NULL,cal.met)
+                                sig.result <- CalSigSNP(ratio.mat=test.expdata,snp.mat=test.snpdata,overlapsnp=overlapsnp,
+                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam=NULL,method=cal.met)
                                 if (method == "boxplot")    sig.result
                                 else if (method != "boxplot" & length(sig.result) != 0){
                                     inter.cn <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX","UpEX","Types","Diff.P","ShortEX","LongEX","NeighborEX","ShortNeighborEX","LongNeighborEX","RetainEX")
