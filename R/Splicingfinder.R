@@ -1,4 +1,4 @@
-﻿Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=NULL){
+Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=NULL){
     NItest <- function(exon.info,intron.info,alt.intron.info,tx.gene=NULL){
         NI.exons <- NULL
         alt.intron.info <- alt.intron.info[1,]
