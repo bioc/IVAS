@@ -47,7 +47,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                 Total.chr <- unique(as.matrix(sub.snplocus[,"CHR"]))
                 Total.chr <- Total.chr[order(as.integer(Total.chr))]
                 for (j in 1:length(Total.chr)){
-                    if (method != "boxplot"){
+                    if (cal.met != "boxplot"){
                         print (paste("-------------------Processing : chr",Total.chr[j]," (",each.type,") -------------------",sep=""))
                     }
                     ch.sub.exon.ratio <- rbind(sub.exon.ratio[sub.exon.ratio[,"Nchr"] == Total.chr[j],])
@@ -76,9 +76,9 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                                 rownames(test.snpdata) <- inter.snp
                                 test.snplocus <- rbind(ch.snp.locus[is.element(ch.snp.locus[,"SNP"],overlapsnp[,"snp"]),])
                                 sig.result <- CalSigSNP(ratio.mat=test.expdata,snp.mat=test.snpdata,overlapsnp=overlapsnp,
-                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam=NULL,method=cal.met)
-                                if (method == "boxplot")    sig.result
-                                else if (method != "boxplot" & length(sig.result) != 0){
+                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam,cal.met=cal.met)
+                                if (cal.met == "boxplot")    sig.result
+                                else if (cal.met != "boxplot" & length(sig.result) != 0){
                                     inter.cn <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX","UpEX","Types","Diff.P","ShortEX","LongEX","NeighborEX","ShortNeighborEX","LongNeighborEX","RetainEX")
                                     inter.cn <- inter.cn[is.element(inter.cn,colnames(each.sub.exon.ratio))]
                                     pre.inf <- rep(rbind(each.sub.exon.ratio[,inter.cn]),nrow(sig.result))
@@ -92,18 +92,18 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                         }
                         else {NULL}
                     }
-                    if (method == "boxplot")    total.result <- pa.result
+                    if (cal.met == "boxplot")    total.result <- pa.result
                     else {
                         total.result <- rbind(total.result,pa.result)
                         if (length(total.result) != 0)    colnames(total.result)[1] <- "SNP"
                     }
                 }
-                if (method == "boxplot") total.result
+                if (cal.met == "boxplot") total.result
                 else    unique(total.result)
             }
             else    NULL
         })
-        if (method == "boxplot")    return (final.result[[1]])
+        if (cal.met == "boxplot")    return (final.result[[1]])
     }
     names(final.result) <- subtypes
     if (length(final.result$"ES") != 0){
