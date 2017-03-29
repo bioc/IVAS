@@ -76,7 +76,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                                 rownames(test.snpdata) <- inter.snp
                                 test.snplocus <- rbind(ch.snp.locus[is.element(ch.snp.locus[,"SNP"],overlapsnp[,"snp"]),])
                                 sig.result <- CalSigSNP(ratio.mat=test.expdata,snp.mat=test.snpdata,overlapsnp=overlapsnp,
-                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam,cal.met=cal.met)
+                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam,method=cal.met)
                                 if (cal.met == "boxplot")    sig.result
                                 else if (cal.met != "boxplot" & length(sig.result) != 0){
                                     inter.cn <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX","UpEX","Types","Diff.P","ShortEX","LongEX","NeighborEX","ShortNeighborEX","LongNeighborEX","RetainEX")
