@@ -1,4 +1,4 @@
-﻿citHeader("Citation of IVAS : ")
+citHeader("Citation of IVAS : ")
 citEntry(entry = "Article",  textVersion = "Han, S., Jung, H., Lee, K. et al. Genome wide discovery of genetic variants affecting alternative splicing patterns in human using bioinformatics method. Genes Genom 2017. (39), 453-459.",
 title  = "Genome wide discovery of genetic variants affecting alternative splicing patterns in human using bioinformatics method",
 author = "Seonggyun Han, Hyeim Jung, Kichan Lee, Hyunho Kim, and Sangsoo Kim",

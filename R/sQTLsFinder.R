@@ -32,10 +32,11 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
     if (length(Total.snpdata) != 0){
         Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
         total.result <- NULL
-        final.result <- lapply(paste(subtypes,method,sep="-"),function(each.type){
+        final.result <- lapply(paste(subtypes,method,GroupSam,sep="-"),function(each.type){
             each.type <- unlist(strsplit(each.type,"-"))
             cal.met <- each.type[2]
             each.type <- each.type[1]
+            if (length(each.type) == 3)    GroupSam <- each.type[3]
             sub.exon.ratio.mat <- gsub(" ","",as.matrix(Exon.ratio.mat[[each.type]]))
             sub.snplocus <- rbind(Total.snplocus[is.element(Total.snplocus[,"CHR"],unique(sub.exon.ratio.mat[,"Nchr"])),])
             inter.snp <- intersect(rownames(Total.snpdata),sub.snplocus[,"SNP"])
@@ -77,7 +78,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                                 rownames(test.snpdata) <- inter.snp
                                 test.snplocus <- rbind(ch.snp.locus[is.element(ch.snp.locus[,"SNP"],overlapsnp[,"snp"]),])
                                 sig.result <- CalSigSNP(ratio.mat=test.expdata,snp.mat=test.snpdata,overlapsnp=overlapsnp,
-                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam,method=cal.met)
+                                    each.snplocus=test.snplocus,chr=Total.chr[j],each.gene=each.sub.exon.ratio[,"EnsID"],GroupSam=GroupSam,method=cal.met)
                                 if (cal.met == "boxplot")    sig.result
                                 else if (cal.met != "boxplot" & length(sig.result) != 0){
                                     inter.cn <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX","UpEX","Types","Diff.P","ShortEX","LongEX","NeighborEX","ShortNeighborEX","LongNeighborEX","RetainEX")
