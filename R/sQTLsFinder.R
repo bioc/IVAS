@@ -1,5 +1,6 @@
 sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSam=NULL,method="lm",CalIndex=NULL,Ncor=1,out.dir=NULL){
     cal.met <- method
+    GroupSam <- NULL
     total.result <- NULL
     Exon.ratio.mat <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))
     names(Exon.ratio.mat) <- c("ES","ASS","IR")

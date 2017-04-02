@@ -2,7 +2,7 @@ Package: IVAS
 Type: Package
 Title: Identification of genetic Variants affecting Alternative
         Splicing
-Version: 1.95.1
+Version: 1.95.2
 Author: Seonggyun Han, Sangsoo Kim
 Maintainer: Seonggyun Han <hangost@ssu.ac.kr>
 Description: Identification of genetic variants affecting alternative splicing.
