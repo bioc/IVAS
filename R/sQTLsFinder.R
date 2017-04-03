@@ -33,11 +33,11 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
         Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
         total.result <- NULL
         final.result <- lapply(paste(subtypes,method,GroupSam,sep="-"),function(each.type){
-            GroupSam <- NULL
             each.type <- unlist(strsplit(each.type,"-"))
             cal.met <- each.type[2]
             each.type <- each.type[1]
             if (length(each.type) == 3)    GroupSam <- each.type[3]
+            else    GroupSam <- NULL
             sub.exon.ratio.mat <- gsub(" ","",as.matrix(Exon.ratio.mat[[each.type]]))
             sub.snplocus <- rbind(Total.snplocus[is.element(Total.snplocus[,"CHR"],unique(sub.exon.ratio.mat[,"Nchr"])),])
             inter.snp <- intersect(rownames(Total.snpdata),sub.snplocus[,"SNP"])
