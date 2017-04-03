@@ -1,6 +1,5 @@
 sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSam=NULL,method="lm",CalIndex=NULL,Ncor=1,out.dir=NULL){
     cal.met <- method
-    GroupSam <- NULL
     total.result <- NULL
     Exon.ratio.mat <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))
     names(Exon.ratio.mat) <- c("ES","ASS","IR")
@@ -34,6 +33,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
         Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
         total.result <- NULL
         final.result <- lapply(paste(subtypes,method,GroupSam,sep="-"),function(each.type){
+            GroupSam <- NULL
             each.type <- unlist(strsplit(each.type,"-"))
             cal.met <- each.type[2]
             each.type <- each.type[1]
