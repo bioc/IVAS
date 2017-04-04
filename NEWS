@@ -11,3 +11,6 @@ Update 1.8.0
 Update 1.9.0
 - Modify RatioFromFPKM, Splicingfinder, and sQTLsFinder
 - Modify manual and tutorial
+
+Update 1.95.4
+- Debugging and modify sQTLsFinder

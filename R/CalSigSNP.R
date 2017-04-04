@@ -39,7 +39,7 @@ CalSigSNP <- function(ratio.mat=NULL,snp.mat=NULL,overlapsnp=NULL,each.snplocus=
             test.each.snp <- rbind(snp.mat[test.each.num,realNA])
             skEX.ratio <- test.exp*100
             inEX.ratio <- (1-test.exp)*100
-            genoform <- as.matrix(test.snp[test.each.num,])
+            genoform <- rbind(test.snp[test.each.num,])
             lm.geno <- unique(unlist(strsplit(rownames(table(genoform)),"")))
             if (length(lm.geno)>1){
                 if(length(lm.geno)==2){
@@ -55,7 +55,7 @@ CalSigSNP <- function(ratio.mat=NULL,snp.mat=NULL,overlapsnp=NULL,each.snplocus=
                 matrix.geno <- matrix(as.integer(gsub(01,1,matrix.geno)),ncol=length(matrix.geno))
                 matrix.geno <- matrix(as.integer(gsub(11,2,matrix.geno)),ncol=length(matrix.geno))
                 pregeno <- matrix(pregeno,ncol=length(matrix.geno))
-                colnames(matrix.geno) <- rownames(genoform)
+                colnames(matrix.geno) <- colnames(genoform)
                 lm.genoform <- matrix.geno
                 Ratios <- NULL
                 if (length(GroupSam) != 0){

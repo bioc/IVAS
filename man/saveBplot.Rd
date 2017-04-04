@@ -21,7 +21,7 @@
         A data frame containing locus information of SNP markers in the snpdata.
     }
     \item{CalIndex}{
-        n index number in the ASdb object which will be tested in this function.
+        An index number in the ASdb object which will be tested in this function.
     }
     \item{out.dir}{
         An output directory.

@@ -1,9 +1,13 @@
-citHeader("Citation of IVAS : ")
-citEntry(entry = "Article",  textVersion = "Han, S., Jung, H., Lee, K. et al. Genome wide discovery of genetic variants affecting alternative splicing patterns in human using bioinformatics method. Genes Genom 2017. (39), 453-459.",
-title  = "Genome wide discovery of genetic variants affecting alternative splicing patterns in human using bioinformatics method",
-author = "Seonggyun Han, Hyeim Jung, Kichan Lee, Hyunho Kim, and Sangsoo Kim",
-journal = "Genes Genom",
-year = "2017",
-
-volumn = "39",
-pages = "453-459.")
+citEntry(entry="article",
+	title = "Genome wide discovery of genetic variants affecting alternative splicing patterns in human using bioinformatics method",
+	author = personList(as.person("Seonggyun Han"),
+		as.person("Hyeim Jung"),
+		as.person("Kichan Lee"),
+		as.person("Hyunho Kim"),
+		as.person("Sangsoo Kim")),
+	year = 2017,
+	journal = "Genes & Genomics",
+	volume = "39",
+	issue = "4",
+	doi = "10.1007/s13258-016-0466-7",
+	textVersion = "Han, S., Jung, H., Lee, K. et al. Genes Genom (2017) 39: 453. doi:10.1007/s13258-016-0466-7")
