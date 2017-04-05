@@ -1,5 +1,5 @@
 sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSam=NULL,method="lm",CalIndex=NULL,Ncor=1,out.dir=NULL){
-    testSNP <- function(ex.r.mat){
+    testSNP <- function(ex.r.mat,MP){
         if (!length(ex.r.mat))    return (NULL)
         te.chr <- intersect(Total.snplocus[,"CHR"],unique(ex.r.mat[,"Nchr"]))
         ex.r.mat <- rbind(ex.r.mat[is.element(ex.r.mat[,"Nchr"],te.chr),])
@@ -12,8 +12,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
             return (NULL)
         }
         ov.sam <- intersect(colnames(ex.r.mat),colnames(snpdata))
-        pa.result <- foreach(i=seq_len(nrow(ex.r.mat)),
-            .packages=called.packages,.combine=rbind) %dopar% {
+        mulsq <- function(i){
             ea.ex.ra <- rbind(ex.r.mat[i,])
             ea.cn <- colnames(ea.ex.ra)
             te.exp <- rbind(ea.ex.ra[,ov.sam])
@@ -41,10 +40,10 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
                 snp.lo <- is.element(snplocus[,"SNP"],overlapsnp[,"snp"])
                 te.snplo <- rbind(snplocus[snp.lo,])
                 sig.re <- CalSigSNP(ratio.mat=te.exp,snp.mat=te.snp,
-                              overlapsnp=overlapsnp,each.snplocus=
-                              te.snplo,chr=ea.ex.ra[,"Nchr"],
-                              each.gene=ea.ex.ra[,"EnsID"],
-                              GroupSam=GroupSam,method=method)
+                    overlapsnp=overlapsnp,each.snplocus=
+                    te.snplo,chr=ea.ex.ra[,"Nchr"],
+                    each.gene=ea.ex.ra[,"EnsID"],
+                    GroupSam=GroupSam,method=method)
                 if (method == "boxplot")    sig.re
                 else if (method != "boxplot" & length(sig.re) != 0){
                     ov.cn <- inter.cns[is.element(inter.cns,ea.cn)]
@@ -58,9 +57,11 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
             }
             else    NULL
         }
-        if (length(pa.result) & method  != "boxplot"){
-            colnames(pa.result)[1] <- "SNP"
-            }
+        pa.result <- bplapply(seq_len(nrow(ex.r.mat)),mulsq,BPPARAM=MP)
+        if (method  != "boxplot"){
+            pa.result <- do.call(rbind,pa.result)
+            if (length(pa.result))    colnames(pa.result)[1] <- "SNP"
+        }
         return (pa.result)
     }
     FDR.cal <- function(each.result){
@@ -81,7 +82,6 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
         }
         return (each.result)
     }
-            
     called.packages <- c("lme4","GenomicRanges","GenomicFeatures")
     ex.cns <- c("DownEX","UpEX","ShortEX","LongEX","NeighborEX",
         "ShortNeighborEX","LongNeighborEX")
@@ -94,7 +94,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
     sig.re <- NULL
     FdrByGroups <- NULL
     FdrByGeno <- NULL
-    registerDoParallel(cores=Ncor)
+    MP <- MulticoreParam(workers=Ncor)
     Total.snplocus <- gsub(" ","",as.matrix(Total.snplocus))
     Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
     Ex.f.re <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))
@@ -107,8 +107,8 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
             ES.mat <- rbind(ES.mat[is.element(ES.mat[,"Index"],CalIndex),])
         }
         if (length(ES.mat)){
-            ES.re <- testSNP(ES.mat)
-            if (method == "boxplot")    return (ES.re)
+            ES.re <- testSNP(ES.mat,MP)
+            if (method == "boxplot")    return (ES.re[[1]])
             ES.re <- FDR.cal(ES.re)
             if (length(ES.re))    Exon.ratio.mat$ES <- ES.re
         }
@@ -119,8 +119,8 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
             ASS.mat <- rbind(ASS.mat[is.element(ASS.mat[,"Index"],CalIndex),])
         }
         if (length(ASS.mat)){
-            ASS.re <- testSNP(ASS.mat)
-            if (method == "boxplot")    return (ASS.re)
+            ASS.re <- testSNP(ASS.mat,MP)
+            if (method == "boxplot")    return (ASS.re[[1]])
             ASS.re <- FDR.cal(ASS.re)
             if (length(ASS.re))    Exon.ratio.mat$ASS <- ASS.re
         }
@@ -131,8 +131,8 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
             IR.mat <- rbind(IR.mat[is.element(IR.mat[,"Index"],CalIndex),])
         }
         if (length(IR.mat)){
-            IR.re <- testSNP(IR.mat)
-            if (method == "boxplot")    return (IR.re)
+            IR.re <- testSNP(IR.mat,MP)
+            if (method == "boxplot")    return (IR.re[[1]])
             IR.re <- FDR.cal(IR.re)
             if (length(IR.re))    Exon.ratio.mat$IR <- IR.re
         }

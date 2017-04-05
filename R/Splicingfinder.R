@@ -734,8 +734,12 @@ Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=N
         }
         return(cluster.result)
     }
-    GTFdb <- chrseparate(GTFdb,1:22)    
-    registerDoParallel(cores=Ncor)
+    mulspl <- function(j){
+        strandinfo <- unique(each.chr.txTable[each.chr.txTable[,"GENEID"] == up2gene[j],"TXSTRAND"])
+        Altvalue <- findAlternative(up2gene[j],each.chr.txTable,each.chr.exon.range,each.chr.intron.range,Total.chr[i])
+        Alt.result <- CalAlt(Altvalue)
+        Alt.result
+    }
     newTypes <- "both"
     trans.exon.range <- exonsBy(GTFdb,by="tx")
     trans.intron.range <- intronsByTranscript(GTFdb)
@@ -752,6 +756,9 @@ Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=N
     ES.finl.result <- NULL
     ASS.finl.result <- NULL
     IR.finl.result <- NULL
+    Alt.result <- NULL
+    j = NULL
+    MP <- MulticoreParam(workers=Ncor)
     for (i in 1:length(Total.chr)){
         print (paste("-------------------Processing : chr ",Total.chr[i]," -------------------",sep=""))
         each.chr.db <- chrseparate(GTFdb,Total.chr[i])
@@ -763,13 +770,7 @@ Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=N
         tx.num <- table(each.chr.txTable[,"GENEID"])
         not.one.gene <- which(tx.num > 1)
         up2gene <- names(not.one.gene)
-        called.packages <- c("GenomicRanges","GenomicFeatures")
-        j = NULL
-        pa.result <- foreach(j=1:length(up2gene),.packages=called.packages) %dopar% {
-            strandinfo <- unique(each.chr.txTable[each.chr.txTable[,"GENEID"] == up2gene[j],"TXSTRAND"])
-            Altvalue <- findAlternative(up2gene[j],each.chr.txTable,each.chr.exon.range,each.chr.intron.range,Total.chr[i])
-            Alt.result <- CalAlt(Altvalue)
-            }
+        pa.result <- bplapply(seq_len(length(up2gene)),mulspl,BPPARAM=MP)
         ES.finl.result <- rbind(ES.finl.result,do.call(rbind,lapply(pa.result,function(x) x$"ES")))
         ASS.finl.result <- rbind(ASS.finl.result,do.call(rbind,lapply(pa.result,function(x) x$"ASS")))
         IR.finl.result <- rbind(IR.finl.result,do.call(rbind,lapply(pa.result,function(x) x$"IR")))
