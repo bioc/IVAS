@@ -193,15 +193,29 @@ RatioFromFPKM <- function(GTFdb=NULL,ASdb=NULL,Total.expdata=NULL,CalIndex=NULL,
         names(final.result.mat) <- c("ES","ASS","IR")
         return (final.result.mat)
     }
-    registerDoParallel(cores=Ncor)
-    
-    
-    
+    mul.te <- function(j,each.type.result,sub.txTable,sub.expdata,sub.exon.range,sub.intron.range,estimateRatio,Ea.Alt,u.genes){
+        each.ES <- rbind(each.type.result[each.type.result[,"EnsID"] == u.genes[j],])
+        each.tx.info <- sub.txTable[sub.txTable[,"GENEID"] == unique(each.ES[,"EnsID"]),]
+        Exon.info <- findAlternative(unique(each.ES[,"EnsID"]),sub.txTable,sub.exon.range,sub.intron.range,unique(each.ES[,"Nchr"]))$exonRange
+        exon.start <- unlist(start(Exon.info))
+        exon.end <- unlist(end(Exon.info))
+        exon.mat <- cbind(exon.start,exon.end)
+        each.exon.locus <- paste(exon.start,exon.end,sep="-")
+        names(each.exon.locus) <- names(exon.end)
+        expdata <- sub.expdata[intersect(rownames(sub.expdata),each.tx.info[,"TXNAME"]),]
+        each.ES <- list(each.ES)
+        names(each.ES) <- Ea.Alt
+        if (length(expdata) != 0){
+            each.ratio <- estimateRatio(expdata,each.tx.info,each.exon.locus,each.ES)[[Ea.Alt]]
+            each.ratio
+        }
+        else    NULL
+    }
     Total.expdata <- as.matrix(Total.expdata)
     pre.ES.alt <- ASdb@"SplicingModel"[["ES"]]
     pre.ASS.alt <- ASdb@"SplicingModel"[["ASS"]]
     pre.IR.alt <- ASdb@"SplicingModel"[["IR"]]
-    
+    MP <- SnowParam(workers=Ncor,type="SOCK")
     tested.geneid <- unique(c(pre.ES.alt[,is.element(colnames(pre.ES.alt),"EnsID")],pre.ASS.alt[,is.element(colnames(pre.ASS.alt),"EnsID")],pre.IR.alt[,is.element(colnames(pre.IR.alt),"EnsID")]))
     total.chr <- unique(c(pre.ES.alt[,is.element(colnames(pre.ES.alt),"Nchr")],pre.ASS.alt[,is.element(colnames(pre.ASS.alt),"Nchr")],pre.IR.alt[,is.element(colnames(pre.IR.alt),"Nchr")]))
     total.chr <- total.chr[order(as.integer(gsub("chr","",total.chr)))]
@@ -227,25 +241,13 @@ RatioFromFPKM <- function(GTFdb=NULL,ASdb=NULL,Total.expdata=NULL,CalIndex=NULL,
         if (length(each.type.result) != 0){
             u.genes <- unique(each.type.result[,"EnsID"])
             each.ratio <- NULL
-            pa.result <- foreach(j=1:length(u.genes),.packages=called.packages,.combine=rbind) %dopar% {
-                each.ES <- rbind(each.type.result[each.type.result[,"EnsID"] == u.genes[j],])
-                each.tx.info <- txTable[txTable[,"GENEID"] == unique(each.ES[,"EnsID"]),]
-                Exon.info <- findAlternative(unique(each.ES[,"EnsID"]),sub.txTable,sub.exon.range,sub.intron.range,unique(each.ES[,"Nchr"]))$exonRange
-                exon.start <- unlist(start(Exon.info))
-                exon.end <- unlist(end(Exon.info))
-                exon.mat <- cbind(exon.start,exon.end)
-                each.exon.locus <- paste(exon.start,exon.end,sep="-")
-                names(each.exon.locus) <- names(exon.end)
-                expdata <- sub.expdata[intersect(rownames(sub.expdata),each.tx.info[,"TXNAME"]),]
-                each.ES <- list(each.ES)
-                names(each.ES) <- AltType[i]
-                if (length(expdata) != 0){
-                    each.ratio <- estimateRatio(expdata,each.tx.info,each.exon.locus,each.ES)[[AltType[i]]]
-                    each.ratio
-                }
-                else    NULL
-            }
+            pa.result <- bplapply(seq_len(length(u.genes)),mul.te,BPPARAM=MP,
+                each.type.result=each.type.result,sub.txTable=sub.txTable,
+                sub.expdata=sub.expdata,sub.exon.range=sub.exon.range,
+                sub.intron.range=sub.intron.range,estimateRatio=estimateRatio,
+                Ea.Alt=AltType[i],u.genes=u.genes)
             if (length(pa.result) != 0){
+                pa.result <- do.call(rbind,pa.result)
                 rownames(pa.result) <- c(1:nrow(pa.result))
                 final.total.ratio[[i]] <- pa.result
             }

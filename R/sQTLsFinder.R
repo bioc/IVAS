@@ -82,7 +82,6 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
         }
         return (each.result)
     }
-    called.packages <- c("lme4","GenomicRanges","GenomicFeatures")
     ex.cns <- c("DownEX","UpEX","ShortEX","LongEX","NeighborEX",
         "ShortNeighborEX","LongNeighborEX")
     inter.cns <- c("Index","EnsID","Strand","Nchr","1stEX","2ndEX","DownEX",
@@ -94,7 +93,7 @@ sQTLsFinder <- function(ASdb=NULL,Total.snpdata=NULL,Total.snplocus=NULL,GroupSa
     sig.re <- NULL
     FdrByGroups <- NULL
     FdrByGeno <- NULL
-    MP <- MulticoreParam(workers=Ncor)
+    MP <- SnowParam(workers=Ncor,type="SOCK")
     Total.snplocus <- gsub(" ","",as.matrix(Total.snplocus))
     Total.snpdata <- gsub(" ","",as.matrix(Total.snpdata))
     Ex.f.re <- list(as.matrix("NA"),as.matrix("NA"),as.matrix("NA"))

@@ -758,7 +758,7 @@ Splicingfinder <- function(GTFdb=NULL,txTable=NULL,calGene=NULL,Ncor=1,out.dir=N
     IR.finl.result <- NULL
     Alt.result <- NULL
     j = NULL
-    MP <- MulticoreParam(workers=Ncor)
+    MP <- SnowParam(workers=Ncor,type="SOCK")
     for (i in 1:length(Total.chr)){
         print (paste("-------------------Processing : chr ",Total.chr[i]," -------------------",sep=""))
         each.chr.db <- chrseparate(GTFdb,Total.chr[i])
