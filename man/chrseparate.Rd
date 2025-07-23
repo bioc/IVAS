@@ -29,7 +29,7 @@
 }
 \seealso{
     \code{\link[GenomicFeatures]{isActiveSeq}},
-    \code{\link[GenomeInfoDb]{seqinfo}}
+    \code{\link[Seqinfo]{seqinfo}}
 }
 \examples{
     sampleDB <- system.file("extdata", "sampleDB", package="IVAS")
